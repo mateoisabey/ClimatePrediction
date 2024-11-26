@@ -1,0 +1,11 @@
+{
+    "train_data_dir": "data/raw/Train",
+    "variables": [
+        "TMQ", "U850", "V850", "UBOT", "VBOT", "QREFHT", "PS", "PSL",
+        "T200", "T500", "PRECT", "TS", "TREFHT", "Z1000", "Z200", "ZBOT"
+    ],
+    "num_classes": 3,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "epochs": 10
+}
