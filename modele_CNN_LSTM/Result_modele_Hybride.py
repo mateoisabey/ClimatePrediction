@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from modele_Hybride import CNN_LSTM_Model
-from dataRNN import ClimateDataset
+from data.dataRNN import ClimateDataset
 from models import SimpleCNN
 from mpl_toolkits.basemap import Basemap
 import xarray as xr

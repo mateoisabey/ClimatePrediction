@@ -3,7 +3,7 @@ from modele_Hybride import CNN_BiLSTM_Model
 import torch
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from dataRNN import ClimateDataset
+from data.dataRNN import ClimateDataset
 import csv
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -40,7 +40,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.00001, weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
 
 # Initialiser les meilleures métriques et historique
-num_epochs = 200
+num_epochs = 2
 num_classes = 3
 history = {"loss": [], "accuracy": [], "precision": [], "recall": [], "f1": [], "iou": []}
 
@@ -57,7 +57,7 @@ def calculate_iou_per_class(preds, labels, num_classes):
     return iou_per_class
 
 # Chemin vers le fichier CSV
-csv_file = "training_metrics.csv"
+csv_file = "modele_CNN_LSTM/training_metrics.csv"
 
 # Initialiser le fichier CSV avec des en-têtes si le fichier n'existe pas
 if not Path(csv_file).is_file():
@@ -152,7 +152,7 @@ for epoch in range(num_epochs):
 
     # Enregistrer le modèle à la dernière époque
     if epoch == num_epochs - 1:
-        torch.save(model.state_dict(), f"final_model.pth")
+        torch.save(model.state_dict(), f"model/final_model.pth")
         print("[INFO] Modèle sauvegardé à la fin de l'entraînement.", flush=True)
 
     # Mise à jour du scheduler

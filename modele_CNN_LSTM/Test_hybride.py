@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from modele_Hybride import CNN_LSTM_Model
-from dataRNN import ClimateDataset
-from modelsCNN import SimpleCNN
+from data.dataRNN import ClimateDataset
+from models import SimpleCNN
 
 # Définir le device pour PyTorch (utiliser le GPU si disponible, sinon le CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

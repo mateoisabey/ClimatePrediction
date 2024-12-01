@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Charger les données
-file_path = 'training_metrics.csv'
+file_path = 'modele_CNN_LSTM/training_metrics.csv'
 data = pd.read_csv(file_path)
 
 # Graphique 1 : Évolution de la perte (Loss)

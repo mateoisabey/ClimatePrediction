@@ -7,12 +7,13 @@ import torch.nn.functional as F
 
 class ClimateDataset(Dataset):
     def __init__(self, data_dir, sequence_length=5, target_size=(16, 16)):
+        # Chargement et tri des fichiers .nc
         self.data_files = sorted([os.path.join(data_dir, file) for file in os.listdir(data_dir) if file.endswith('.nc')])
         self.sequence_length = sequence_length
-        self.target_size = target_size  # Taille après réduction spatiale
+        self.target_size = target_size
         print(f"[INFO] Nombre de fichiers .nc trouvés : {len(self.data_files)}", flush=True)
 
-        # Normalisation des variables (à ajuster avec vos statistiques)
+        # Normalisation pour chaque variable
         self.stats = {
             'TMQ': {'mean': 19.218493883511705, 'std': 15.81727654092718},
             'U850': {'mean': 1.5530236518163378, 'std': 8.297621410859342},
@@ -37,25 +38,27 @@ class ClimateDataset(Dataset):
 
     def __getitem__(self, idx):
         features_seq = []
-        for i in range(self.sequence_length):
-            ds = xr.open_dataset(self.data_files[idx + i])
-            features = []
-            for var in self.stats.keys():
-                data = ds[var].values.squeeze()  # Supprimer la dimension temporelle
-                data = (data - self.stats[var]['mean']) / self.stats[var]['std']  # Normalisation
 
-                # Appliquer un pooling pour réduire à `target_size`
-                data = torch.tensor(data).unsqueeze(0)  # Ajouter une dimension de canal
-                data = F.adaptive_avg_pool2d(data, self.target_size).squeeze(0)  # Pooling et suppression du canal
+        for i in range(self.sequence_length):
+            file_path = self.data_files[idx + i]
+            ds = xr.open_dataset(file_path, engine='netcdf4')
+
+            features = []
+            for var, stats in self.stats.items():
+                data = ds[var].values.squeeze()
+                data = (data - stats['mean']) / stats['std']
+                data = torch.tensor(data, dtype=torch.float32).unsqueeze(0)
+                data = F.adaptive_avg_pool2d(data, self.target_size).squeeze(0)
                 features.append(data.numpy())
 
-            # Empiler les canaux réduits pour chaque variable dans une seule matrice (num_vars, target_size[0], target_size[1])
             features = np.stack(features, axis=0)
             features_seq.append(features)
 
-        # Créer un tensor 4D pour la séquence (sequence_length, num_vars, target_size[0], target_size[1])
         features_seq = np.stack(features_seq, axis=0)
-
-        # Extraire les labels (du dernier fichier de la séquence)
+        
+        # Traitement des labels avec réduction de taille
         labels = ds['LABELS'].values.astype(np.int64)
-        return torch.tensor(features_seq, dtype=torch.float32), torch.tensor(labels, dtype=torch.long)
+        labels = torch.tensor(labels, dtype=torch.float32).unsqueeze(0)  # Conversion en Float pour le pooling
+        labels = F.adaptive_max_pool2d(labels, self.target_size).squeeze(0).to(torch.long)  # Reconvertir en Long après le pooling
+
+        return torch.tensor(features_seq, dtype=torch.float32), labels.to(torch.long)

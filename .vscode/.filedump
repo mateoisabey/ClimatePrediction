@@ -1,6 +1,6 @@
 
 		begin
-      f = addfile("/Users/mateoisabey/Documents/UQAC Automne/Machine learning/projetClimate/ClimatePrediction/data/raw/Train/data-2000-04-17-01-1_3.nc","r")
+      f = addfile("/Users/mateoisabey/Documents/UQAC Automne/Machine learning/projetClimate/ClimatePrediction/data/raw/Test/data-2011-06-03-01-1_0.nc","r")
       print(f)
 		end
     
