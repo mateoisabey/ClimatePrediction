@@ -19,10 +19,10 @@ logger = logging.getLogger()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Définir les paramètres de la validation croisée
-k_folds = 2
-num_epochs = 80
-batch_size = 8
-learning_rate = 0.001
+k_folds = 5
+num_epochs = 150
+batch_size = 4
+learning_rate = 0.01
 
 # Charger les données
 data_dir = "./data/raw/Train"
@@ -40,8 +40,8 @@ class_counts = np.bincount(all_labels, minlength=3)  # Assure que toutes les cla
 logger.info(f"Distribution des classes : {class_counts}")
 
 # Calculer les poids des classes pour CrossEntropyLoss
-class_weights = torch.tensor([1.0 / c if c > 0 else 0.0 for c in class_counts], dtype=torch.float32).to(device)
-logger.info(f"Poids des classes : {class_weights}")
+class_weights = torch.tensor([1.0, 100.0, 100.0], dtype=torch.float32).to(device)
+logger.info(f"Poids ajustés des classes : {class_weights}")
 
 # Définir la Focal Loss
 class FocalLoss(nn.Module):
@@ -115,7 +115,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):
 
     # Initialiser le modèle, la perte et l'optimiseur pour ce fold
     model = CGNet(num_classes=3, num_channels=16 * 5).to(device)
-    criterion = FocalLoss(alpha=0.25, gamma=2)  # Utilisation de la Focal Loss
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
     # Scheduler pour ajuster dynamiquement le taux d'apprentissage
@@ -147,6 +147,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):
                 logger.info(
                     f"[Fold {fold + 1}, Époch {epoch + 1}] Batch {batch_idx}/{len(train_loader)} - Loss: {loss.item():.4f}"
                 )
+
 
         # Validation
         model.eval()
