@@ -8,7 +8,6 @@ from torchvision import transforms
 
 class ClimateDataset(Dataset):
     def __init__(self, data_dir, sequence_length=5, target_size=(16, 16), augment=False):
-        # Chargement et tri des fichiers .nc
         self.data_files = sorted([os.path.join(data_dir, file) for file in os.listdir(data_dir) if file.endswith('.nc')])
         self.sequence_length = sequence_length
         self.target_size = target_size
@@ -66,18 +65,18 @@ class ClimateDataset(Dataset):
 
         # Traitement des labels avec réduction de taille
         labels = ds['LABELS'].values.astype(np.int64)
-        labels = torch.tensor(labels, dtype=torch.float32).unsqueeze(0)  # Conversion en Float pour le pooling
-        labels = F.adaptive_max_pool2d(labels, self.target_size).squeeze(0).to(torch.long)  # Reconvertir en Long après le pooling
+        labels = torch.tensor(labels, dtype=torch.float32).unsqueeze(0)
+        labels = F.adaptive_max_pool2d(labels, self.target_size).squeeze(0).to(torch.long)
 
         return features_seq, labels
 
     def apply_augmentation(self, features_seq):
         augmented_seq = []
-        for t in range(features_seq.size(0)):  # Boucle sur la séquence temporelle
-            features = features_seq[t]  # Shape: (Channels, H, W)
-            features = transforms.ToPILImage()(features)  # Convertir en image PIL
-            features = self.transform(features)  # Appliquer les transformations
-            features = transforms.ToTensor()(features)  # Reconvertir en tenseur
+        for t in range(features_seq.size(0)):
+            features = features_seq[t]
+            features = transforms.ToPILImage()(features)
+            features = self.transform(features)
+            features = transforms.ToTensor()(features)
             augmented_seq.append(features)
 
-        return torch.stack(augmented_seq)  # Shape: (Sequence, Channels, H, W)
+        return torch.stack(augmented_seq)
