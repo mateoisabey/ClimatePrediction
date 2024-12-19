@@ -7,7 +7,6 @@ import numpy as np
 from models import SimpleCNN
 from data import CustomClimateDataset
 
-# Définir le device pour PyTorch (utiliser le GPU si disponible, sinon le CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Fonction pour calculer l'IoU
@@ -32,19 +31,18 @@ model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()  # Mettre le modèle en mode évaluation
 
 # Charger le dataset de test
-test_dataset = CustomClimateDataset(data_dir="./data/raw/Test")  # Assurez-vous que le chemin des données de test est correct
+test_dataset = CustomClimateDataset(data_dir="./data/raw/Test")
 test_loader = DataLoader(test_dataset, batch_size=6, shuffle=False)
 
-# Variables pour accumuler les prédictions et les vraies valeurs
 all_preds = []
 all_labels = []
 total_iou = 0
 batch_ious = []
-num_classes = 3  # Remplacez par le nombre de classes dans votre dataset
+num_classes = 3
 
 # Boucle de test
 print("[INFO] Début des prédictions sur le dataset de test...")
-with torch.no_grad():  # Pas de calcul de gradient nécessaire
+with torch.no_grad(): 
     for batch_idx, (images, labels) in enumerate(test_loader):
         images = images.to(device)
         labels = labels.to(device)
