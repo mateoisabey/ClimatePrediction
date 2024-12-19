@@ -6,15 +6,15 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from ClimateDataset import ClimateDataset
-from modele import CGNet  # Importer le nouveau modèle simplifié
+from modele import CGNet
 
 # Initialisation de l'appareil
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"[INFO] Utilisation de l'appareil : {device}")
 
 # Charger le modèle simplifié
-model_path = "modele_CGNet/model.pth"  # Nouveau chemin pour le modèle simplifié
-model = CGNet(num_classes=3, num_channels=7 * 3).to(device)  # Adapter le nombre de canaux
+model_path = "modele_CGNet/model.pth" 
+model = CGNet(num_classes=3, num_channels=7 * 3).to(device)
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 print("[INFO] Modèle CGNet chargé avec succès.")
