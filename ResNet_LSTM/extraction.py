@@ -50,12 +50,12 @@ class ClimateDataset(Dataset):
             features.append(data)
 
         # Combiner les variables et créer un tableau
-        features = np.stack(features, axis=-1)  # (lat, lon, features)
-        labels = dataset["LABELS"].values  # (lat, lon)
+        features = np.stack(features, axis=-1)
+        labels = dataset["LABELS"].values 
 
         # Reshape pour créer une séquence (flattener lat/lon en une seule dimension)
-        seq_features = features.reshape(-1, features.shape[-1])  # (lat * lon, features)
-        seq_labels = labels.flatten()  # (lat * lon)
+        seq_features = features.reshape(-1, features.shape[-1]) 
+        seq_labels = labels.flatten()
 
         return torch.tensor(seq_features, dtype=torch.float32), torch.tensor(seq_labels, dtype=torch.long)
 
