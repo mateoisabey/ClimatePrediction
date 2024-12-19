@@ -22,7 +22,6 @@ print(f"[INFO] Dataset chargé avec {len(train_dataset)} exemples", flush=True)
 train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True)
 
 # Configuration de l'entraînement
-# Exemple de pondération des classes (ajustez selon vos données)
 class_weights = torch.tensor([0.5, 2.0, 2.5]).to(device)
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 
@@ -48,7 +47,7 @@ def calculate_iou(preds, labels, num_classes):
 
 # Boucle d'entraînement
 num_epochs = 15
-num_classes = 3  # Nombre de classes à ajuster selon votre cas
+num_classes = 3
 
 for epoch in range(num_epochs):
     model.train()
@@ -72,10 +71,8 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         outputs = model(images)  # Output attendu : (batch_size, num_classes, height, width)
         
-        # Reformater les labels en 1D : (batch_size * height * width)
         labels = labels.view(-1)
         
-        # Reformater les sorties : (batch_size, num_classes, height, width) -> (batch_size * height * width, num_classes)
         outputs = outputs.permute(0, 2, 3, 1).reshape(-1, outputs.shape[1])
         
         # Calculer la perte
@@ -108,7 +105,6 @@ for epoch in range(num_epochs):
         epoch_f1_sum += batch_f1
         epoch_iou_sum += batch_iou
 
-        # Libérer de la mémoire GPU si nécessaire
         torch.cuda.empty_cache()
 
     # Ajouter des messages de débogage pour vérifier le bon déroulement
