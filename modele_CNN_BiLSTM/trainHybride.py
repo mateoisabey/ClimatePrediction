@@ -8,13 +8,11 @@ import csv
 from pathlib import Path
 import matplotlib.pyplot as plt
 
-# Définir le device pour PyTorch
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Charger le modèle hybride CNN-LSTM
 print("[INFO] Chargement du modèle hybride CNN-LSTM...", flush=True)
 
-cnn_model = SimpleCNN(dropout_rate=0.4)  # Ajuster le taux de dropout si nécessaire
+cnn_model = SimpleCNN(dropout_rate=0.4)
 hidden_dim = 2048
 num_layers = 4
 output_dim = 3
@@ -34,7 +32,7 @@ print(f"[INFO] Dataset chargé avec {len(train_dataset)} exemples", flush=True)
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
 
 # Configuration de l'entraînement
-class_weights = torch.tensor([0.01, 150.0, 26.5]).to(device)  # Ajout d'une pondération pour la classe 1
+class_weights = torch.tensor([0.01, 150.0, 26.5]).to(device)
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.00001, weight_decay=1e-4)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
